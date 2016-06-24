@@ -1,0 +1,27 @@
+name:     raaz-ssh
+version:  0.0.1
+
+synopsis: An implementation of the ssh protocol using the raaz
+  cryptographic library
+
+description: This library provides an ssh implementation that makes
+  use of the raaz cryptographic library. The aim is to provide the
+  implementation of the ssh client and server protocol and not a full
+  fledged server like the openssh. Typically this library can be used
+  to build specialised clients/servers or can be embedded inside which
+  can be used in programs like a version controller or a hosting site.
+
+homepage: http://github.com/raaz-crypto
+
+license:      BSD3
+license-file: LICENSE
+
+author:     Piyush P Kurur
+maintainer: ppk@cse.iitk.ac.in
+
+category:   Raaz, Network
+build-type: Simple
+cabal-version: >=1.9.2
+library
+  build-depends: base                           >= 4.5  && < 5.0
+               , bytestring                     >= 0.9
