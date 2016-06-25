@@ -1,0 +1,110 @@
+language: c
+sudo: false
+notifications:
+  irc: "irc.freenode.net#haskell-raaz"
+
+# Setting up caches
+before-cache:
+  - rm -fv $HOME/.cabal/packages/hackage.haskell.org/build-reports.log
+  - rm -fv $HOME/.cabal/packages/hackage.haskell.org/00-index.tar
+
+cache:
+  directories:
+    - $HOME/.cabsnap
+    - $HOME/.cabal/packages
+
+fast_finish: true
+
+matrix:
+  include:
+    #
+    # Linux builds
+    #
+    # Most recent LTS for 7.8.4 series.
+    # Stackage LTS-2, with 7.8.4 and cabal version-1.18
+    #
+    - os: linux
+      env: STACKVER=lts-2 GHCVER=7.8.4 CABALVER=1.18
+      addons:
+        apt:
+          packages: [ghc-7.8.4, cabal-install-1.18]
+          sources: [hvr-ghc]
+
+    #
+    # Latest Stackage LTS
+    #
+    - os: linux
+      env: STACKVER=lts GHCVER=7.10.3 CABALVER=1.22
+      addons:
+        apt:
+          packages: [ghc-7.10.3, cabal-install-1.22]
+          sources:  [hvr-ghc]
+    #
+    # Stackage nightly
+    #
+    - os: linux
+      env: STACKVER=nightly GHCVER=8.0.1 CABALVER=1.24
+      addons:
+        apt:
+          packages: [ghc-8.0.1, cabal-install-1.24]
+          sources:  [hvr-ghc]
+
+    #
+    # Build against GHC-Head
+    #
+    - os: linux
+      env: GHCVER=head CABALVER=head
+      addons:
+        apt:
+          packages: [ghc-head, cabal-install-head]
+          sources:  [hvr-ghc]
+    - os: linux
+      env: HLINT="yes"
+      addons:
+        apt: { packages: [hlint] }
+    # Other builds
+    - os: osx
+  allow_failures:
+    - env: HLINT="yes"
+    - env: GHCVER=head CABALVER=head
+    - env: STACKVER=nightly GHCVER=8.0.1 CABALVER=1.24
+    - env: STACKVER=lts-2 GHCVER=7.8.4 CABALVER=1.18
+    - os: osx
+before_install:
+ - if [ "$HLINT" == "yes" ]; then
+      hlint "--ignore=Parse error" Raaz;
+      exit $?;
+   fi
+ - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
+ - if [ "$STACKVER" != "" ]; then
+      echo getting the stackage cabal.config;
+      wget "https://www.stackage.org/$STACKVER/cabal.config";
+   fi
+ - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
+ - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ghc cabal-install; fi
+ - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew info ghc cabal-install; fi
+
+install:
+ - cabal --version
+ - echo "$(ghc --version) [$(ghc --print-project-git-commit-id 2> /dev/null || echo '?')]"
+ - travis_retry cabal update
+ - cabal install --only-dependencies --enable-tests --enable-benchmarks
+
+script:
+  - cabal configure --enable-tests --enable-benchmarks -v2
+  - cabal build
+  - cabal test
+  - cabal check
+  - cabal sdist   # tests that a source-distribution can be generated
+  - cabal install --force-reinstalls dist/*-*.tar.gz
+
+  # - SRC_TGZ=$(cabal info . | awk '{print $2;exit}').tar.gz &&
+  #  (cd dist && cabal install --force-reinstalls "$SRC_TGZ")
+
+after_success:
+  - echo "All is well."
+after_failure:
+  - echo "Build failed."
+branches:
+  only:
+    - master
