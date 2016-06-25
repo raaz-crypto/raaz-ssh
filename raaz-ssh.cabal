@@ -25,3 +25,4 @@ cabal-version: >=1.9.2
 library
   build-depends: base                           >= 4.5  && < 5.0
                , bytestring                     >= 0.9
+               , raaz                           == 0.0.1
