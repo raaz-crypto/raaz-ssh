@@ -13,6 +13,11 @@ description: This library provides an ssh implementation that makes
 
 homepage: http://github.com/raaz-crypto
 
+source-repository head
+  type: git
+  location: https://github.com/raaz-crypto/raaz-ssh
+
+
 license:      BSD3
 license-file: LICENSE
 
