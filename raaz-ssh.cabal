@@ -13,9 +13,6 @@ description: This library provides an ssh implementation that makes
 
 homepage: http://github.com/raaz-crypto
 
-source-repository head
-  type: git
-  location: https://github.com/raaz-crypto/raaz-ssh
 
 
 license:      BSD3
@@ -27,6 +24,13 @@ maintainer: ppk@cse.iitk.ac.in
 category:   Raaz, Network
 build-type: Simple
 cabal-version: >=1.9.2
+
+bug-reports: https://github.com/raaz-crypto/raaz-ssh/issues
+
+source-repository head
+  type: git
+  location: https://github.com/raaz-crypto/raaz-ssh
+
 library
   build-depends: base                           >= 4.5  && < 5.0
                , bytestring                     >= 0.9
